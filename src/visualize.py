@@ -10,7 +10,7 @@ from typing import Dict, List, Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix, roc_curve
+from sklearn.metrics import ConfusionMatrixDisplay, auc, confusion_matrix, roc_curve
 
 from .train import TrainingHistory
 
@@ -118,7 +118,7 @@ def plot_roc_curves(
 
     for i, (name, (labels, probs)) in enumerate(roc_data.items()):
         fpr, tpr, _ = roc_curve(labels, probs)
-        auc_val = np.trapz(tpr, fpr)
+        auc_val = auc(fpr, tpr)
         ax.plot(fpr, tpr, color=colors[i % len(colors)], lw=2, label=f"{name} (AUC={auc_val:.3f})")
 
     ax.plot([0, 1], [0, 1], "k--", alpha=0.4, label="Random Baseline")

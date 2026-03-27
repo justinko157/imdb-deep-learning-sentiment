@@ -25,7 +25,7 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from src.dataset import download_imdb, get_dataloaders, load_split
+from src.dataset import get_dataloaders
 from src.evaluate import evaluate_model, get_predictions, print_comparison, run_baselines
 from src.model import CNNClassifier, LSTMClassifier
 from src.train import TrainingConfig, train_model
@@ -94,7 +94,7 @@ def main():
 
     # ── 1. Data ──
     print("\n[1/5] Preparing data...")
-    train_loader, val_loader, test_loader, vocab = get_dataloaders(
+    train_loader, val_loader, test_loader, vocab, raw_splits = get_dataloaders(
         batch_size=args.batch_size,
         max_len=args.max_len,
         max_vocab=args.max_vocab,
@@ -150,10 +150,7 @@ def main():
     # ── 4. Traditional ML baselines ──
     if not args.skip_baselines:
         print("\n[4/5] Running traditional ML baselines...")
-        imdb_path = download_imdb()
-        train_texts, train_labels = load_split(imdb_path, "train")
-        test_texts, test_labels = load_split(imdb_path, "test")
-
+        train_texts, train_labels, test_texts, test_labels = raw_splits
         baseline_results = run_baselines(train_texts, train_labels, test_texts, test_labels)
         all_results.update(baseline_results)
     else:

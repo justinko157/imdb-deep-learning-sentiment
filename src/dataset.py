@@ -5,7 +5,6 @@ Handles downloading the IMDB dataset, tokenization, vocabulary construction,
 sequence padding, and PyTorch DataLoader creation.
 """
 
-import os
 import re
 import tarfile
 import urllib.request
@@ -47,7 +46,7 @@ def download_imdb(data_dir: Path = DATA_DIR) -> Path:
 
     print("Extracting...")
     with tarfile.open(tar_path, "r:gz") as tar:
-        tar.extractall(data_dir)
+        tar.extractall(data_dir, filter="data")
 
     tar_path.unlink()
     print(f"Dataset ready at {extract_path}")
@@ -57,7 +56,7 @@ def download_imdb(data_dir: Path = DATA_DIR) -> Path:
 # ──────────────────────────────────────────────────────────────────────
 # Text preprocessing
 # ──────────────────────────────────────────────────────────────────────
-def clean_text(text: str) -> str:
+def clean_text(text: str) -> list:
     """Clean and normalize a single review string.
 
     Removes HTML tags, non-alphabetic characters, and lowercases the text.
@@ -181,7 +180,8 @@ def get_dataloaders(
         val_split: Fraction of training data used for validation.
 
     Returns:
-        Tuple of (train_loader, val_loader, test_loader, vocab).
+        Tuple of (train_loader, val_loader, test_loader, vocab, raw_splits)
+        where raw_splits is (train_texts, train_labels, test_texts, test_labels).
     """
     path = download_imdb()
 
@@ -209,4 +209,4 @@ def get_dataloaders(
     val_loader = DataLoader(val_dataset, batch_size=batch_size)
     test_loader = DataLoader(test_dataset, batch_size=batch_size)
 
-    return train_loader, val_loader, test_loader, vocab
+    return train_loader, val_loader, test_loader, vocab, (train_texts, train_labels, test_texts, test_labels)
